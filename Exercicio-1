@@ -1,0 +1,159 @@
+class Teatro:
+    def __init__(self, linhas, colunas, valor_ingresso):
+        self.linhas = linhas
+        self.colunas = colunas
+        self.total_cadeiras = linhas * colunas
+        self.valor_ingresso = valor_ingresso
+        self.cadeiras = [['Livre' for _ in range(colunas)] for _ in range(linhas)]
+        self.reservas = 0
+        self.vendidas = 0
+        self.receita_total = 0
+        self.receita_reservas = 0
+        self.receita_nao_recebida = 0
+
+    def menu(self):
+        while True:
+            print("\n[1] - Iniciar o teatro")
+            print("[2] - Reservar lugar")
+            print("[3] - Comprar lugar")
+            print("[4] - Liberar lugar")
+            print("[5] - Listar poltronas")
+            print("[6] - Encerrar o espetáculo")
+            print("[7] - Reiniciar o espetáculo")
+            print("[0] - Sair")
+            opcao = int(input("Escolha uma opção: "))
+
+            if opcao == 1:
+                self.iniciar_teatro()
+            elif opcao == 2:
+                self.reservar_lugar()
+            elif opcao == 3:
+                self.comprar_lugar()
+            elif opcao == 4:
+                self.liberar_lugar()
+            elif opcao == 5:
+                self.listar_poltronas()
+            elif opcao == 6:
+                self.encerrar_espetaculo()
+            elif opcao == 7:
+                self.reiniciar_espetaculo()
+            elif opcao == 0:
+                break
+            else:
+                print("Opção inválida. Escolha novamente.")
+
+    def iniciar_teatro(self):
+        if self.reservas == 0 and self.vendidas == 0:
+            linhas = int(input("Informe o número de linhas ocupadas: "))
+            colunas = int(input("Informe o número de colunas ocupadas: "))
+            if linhas <= self.linhas and colunas <= self.colunas:
+                self.reservas = 0
+                self.vendidas = 0
+                self.cadeiras = [['Livre' for _ in range(self.colunas)] for _ in range(self.linhas)]
+                print("Teatro iniciado com sucesso!")
+            else:
+                print("Número de linhas ou colunas inválido.")
+        else:
+            print("Não é possível iniciar o teatro com um espetáculo em andamento.")
+
+    def reservar_lugar(self):
+        linha = int(input("Informe a linha: "))
+        coluna = int(input("Informe a coluna: "))
+        
+        if self.cadeiras[linha][coluna] == 'Livre':
+            self.cadeiras[linha][coluna] = 'Reservado'
+            self.receita_reservas += 0.3 * self.valor_ingresso
+            print("Lugar reservado com sucesso!")
+        else:
+            print("Lugar já reservado ou vendido. Escolha outro lugar.")
+
+    def comprar_lugar(self):
+        linha = int(input("Informe a linha: "))
+        coluna = int(input("Informe a coluna: "))
+        
+        if self.cadeiras[linha][coluna] == 'Livre':
+            self.cadeiras[linha][coluna] = 'Vendido'
+            self.receita_total += self.valor_ingresso
+            self.vendidas += 1
+            print("Lugar comprado com sucesso!")
+        elif self.cadeiras[linha][coluna] == 'Reservado':
+            self.cadeiras[linha][coluna] = 'Vendido'
+            self.receita_total += 0.7 * self.valor_ingresso
+            self.receita_reservas -= 0.3 * self.valor_ingresso
+            self.vendidas += 1
+            self.reservas -= 1
+            print("Lugar comprado com sucesso!")
+        else:
+            print("Lugar já vendido. Escolha outro lugar.")
+
+    def liberar_lugar(self):
+        linha = int(input("Informe a linha: "))
+        coluna = int(input("Informe a coluna: "))
+        
+        if self.cadeiras[linha][coluna] == 'Reservado':
+            self.cadeiras[linha][coluna] = 'Livre'
+            self.reservas -= 1
+            self.receita_reservas -= 0.3 * self.valor_ingresso
+            print("Reserva liberada com sucesso!")
+        elif self.cadeiras[linha][coluna] == 'Vendido':
+            self.cadeiras[linha][coluna] = 'Livre'
+            self.vendidas -= 1
+            self.receita_total -= self.valor_ingresso
+            print("Venda liberada com sucesso!")
+        else:
+            print("Lugar já está livre.")
+
+    def listar_poltronas(self):
+        livres = 0
+        reservados = 0
+        vendidos = 0
+        
+        for linha in self.cadeiras:
+            for lugar in linha:
+                if lugar == 'Livre':
+                    livres += 1
+                elif lugar == 'Reservado':
+                    reservados += 1
+                elif lugar == 'Vendido':
+                    vendidos += 1
+        
+        print(f"Total Geral de Cadeiras: {self.total_cadeiras}")
+        print(f"Total de Cadeiras Vazias: {livres}")
+        print(f"Total de Cadeiras Reservadas: {reservados}")
+        print(f"Total de Cadeiras Vendidas: {vendidos}")
+        print(f"Total do Espetáculo em R$: {self.receita_total:.2f}")
+        print(f"Total não recebido em R$: {self.receita_nao_recebida:.2f}")
+        print(f"Total em reservas R$: {self.receita_reservas:.2f}")
+
+    def encerrar_espetaculo(self):
+        ocupacao_minima = int(0.6 * self.total_cadeiras)
+        if self.vendidas >= ocupacao_minima:
+            self.receita_nao_recebida = (self.reservas * 0.3 + self.vendidas) * self.valor_ingresso
+            self.listar_poltronas()
+            print("Total em Reservas Liberadas R$: {:.2f}".format(self.receita_reservas))
+            print("Total Geral do Espetáculo: {:.2f}".format(self.receita_total + self.receita_reservas + self.receita_nao_recebida))
+            print("Espetáculo encerrado com sucesso!")
+        else:
+            print("Não é possível encerrar o espetáculo. Ocupação mínima não atingida.")
+
+    def reiniciar_espetaculo(self):
+        self.reservas = 0
+        self.vendidas = 0
+        self.receita_total = 0
+        self.receita_reservas = 0
+        self.receita_nao_recebida = 0
+        self.cadeiras = [['Livre' for _ in range(self.colunas)] for _ in range(self.linhas)]
+        print("Espetáculo reiniciado com sucesso!")
+
+
+def main():
+    linhas = int(input("Informe o número de linhas do teatro: "))
+    colunas = int(input("Informe o número de colunas do teatro: "))
+    valor_ingresso = float(input("Informe o valor do ingresso: "))
+    
+    teatro = Teatro(linhas, colunas, valor_ingresso)
+    teatro.menu()
+
+
+if __name__ == "__main__":
+    main()
