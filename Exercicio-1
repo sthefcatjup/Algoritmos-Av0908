@@ -144,16 +144,3 @@ class Teatro:
         self.receita_nao_recebida = 0
         self.cadeiras = [['Livre' for _ in range(self.colunas)] for _ in range(self.linhas)]
         print("Espetáculo reiniciado com sucesso!")
-
-
-def main():
-    linhas = int(input("Informe o número de linhas do teatro: "))
-    colunas = int(input("Informe o número de colunas do teatro: "))
-    valor_ingresso = float(input("Informe o valor do ingresso: "))
-    
-    teatro = Teatro(linhas, colunas, valor_ingresso)
-    teatro.menu()
-
-
-if __name__ == "__main__":
-    main()
